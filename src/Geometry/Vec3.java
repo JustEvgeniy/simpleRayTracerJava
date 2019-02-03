@@ -1,0 +1,90 @@
+package Geometry;
+
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Vec3 extends Vector {
+    public Vec3(double x, double y, double z) {
+        data = new double[3];
+        data[0] = x;
+        data[1] = y;
+        data[2] = z;
+    }
+
+    public double getX() {
+        return data[0];
+    }
+
+    public double getY() {
+        return data[1];
+    }
+
+    public double getZ() {
+        return data[2];
+    }
+
+    @Override
+    public Vec3 add(Vector vector) {
+        return new Vec3(
+                data[0] + vector.data[0],
+                data[1] + vector.data[1],
+                data[2] + vector.data[2]);
+    }
+
+    @Override
+    public Vec3 subtract(Vector vector) {
+        return new Vec3(
+                data[0] - vector.data[0],
+                data[1] - vector.data[1],
+                data[2] - vector.data[2]);
+    }
+
+    @Override
+    public Vec3 multiply(double number) {
+        return new Vec3(
+                data[0] * number,
+                data[1] * number,
+                data[2] * number);
+    }
+
+    @Override
+    public double length() {
+        return Math.sqrt(data[0] * data[0] + data[1] * data[1] + data[2] * data[2]);
+    }
+
+    @Override
+    public double dotProduct(Vector vector) {
+        return data[0] * vector.data[0] +
+                data[1] * vector.data[1] +
+                data[2] * vector.data[2];
+    }
+
+    public Vec3 crossProduct(Vec3 vec3) {
+        return new Vec3(
+                data[1] * vec3.data[2] - data[2] * vec3.data[1],
+                data[2] * vec3.data[0] - data[0] * vec3.data[2],
+                data[0] * vec3.data[1] - data[1] * vec3.data[0]);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vec3 vec3 = (Vec3) o;
+        return (Math.abs(data[0] - vec3.data[0]) < EPS) &&
+                (Math.abs(data[1] - vec3.data[1]) < EPS) &&
+                (Math.abs(data[2] - vec3.data[2]) < EPS);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(data[0], data[1], data[2]);
+    }
+
+    @Override
+    public String toString() {
+        return "Vec3{" +
+                "data=" + Arrays.toString(data) +
+                '}';
+    }
+}
