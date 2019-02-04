@@ -15,37 +15,7 @@ public class Main extends Canvas {
     private static BufferedImage image;
 
     public static void main(String[] args) {
-        Material ivory = new Material(new Vec3(0.4, 0.4, 0.3));
-        Material redRubber = new Material(new Vec3(0.3, 0.1, 0.1));
-
-        List<SceneObject> scene = new ArrayList<>();
-        scene.add(new Sphere(new Vec3(-3, 0, -16), 2, ivory));
-        scene.add(new Sphere(new Vec3(-1, -1.5, -12), 2, redRubber));
-        scene.add(new Sphere(new Vec3(1.5, -0.5, -18), 3, redRubber));
-        scene.add(new Sphere(new Vec3(7, 5, -18), 4, ivory));
-
-        List<Light> lights = new ArrayList<>();
-        lights.add(new Light(new Vec3(-20, 20, 20), 1.5));
-
-        Renderer renderer = new Renderer(width, height, 60);
-        Vec3[] frameBuffer = renderer.render(scene, lights);
-
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                int color = 0;
-                color += 255 * Math.min(1, frameBuffer[j + i * height].getX());
-                color <<= 8;
-                color += 255 * Math.min(1, frameBuffer[j + i * height].getY());
-                color <<= 8;
-                color += 255 * Math.min(1, frameBuffer[j + i * height].getZ());
-                image.setRGB(i, j, color);
-            }
-        }
-
-        showImage();
-        saveImage();
+        javax.swing.SwingUtilities.invokeLater(Main::createAndShowGUI);
     }
 
     private static void saveImage() {
@@ -60,12 +30,6 @@ public class Main extends Canvas {
         }
     }
 
-    private static void showImage() {
-        System.out.println("Displaying image");
-
-        javax.swing.SwingUtilities.invokeLater(Main::createAndShowGUI);
-    }
-
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Rendered image");
 
@@ -78,6 +42,27 @@ public class Main extends Canvas {
 
     @Override
     public void paint(Graphics g) {
+        Material ivory = new Material(new double[]{.6, .3}, new Vec3(0.4, 0.4, 0.3), 50);
+        Material redRubber = new Material(new double[]{.9, .1}, new Vec3(0.3, 0.1, 0.1), 10);
+
+        List<SceneObject> scene = new ArrayList<>();
+        scene.add(new Sphere(new Vec3(-3, 0, -16), 2, ivory));
+        scene.add(new Sphere(new Vec3(-1, -1.5, -12), 2, redRubber));
+        scene.add(new Sphere(new Vec3(1.5, -0.5, -18), 3, redRubber));
+        scene.add(new Sphere(new Vec3(7, 5, -18), 4, ivory));
+
+        List<Light> lights = new ArrayList<>();
+        lights.add(new Light(new Vec3(-20, 20, 20), 1.5));
+        lights.add(new Light(new Vec3(30, 50, -25), 1.8));
+        lights.add(new Light(new Vec3(30, 20, 30), 1.7));
+
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        Renderer renderer = new Renderer(this, g, image, width, height, 60);
+        renderer.render(scene, lights);
+
         g.drawImage(image, 0, 0, this);
+
+        saveImage();
     }
 }

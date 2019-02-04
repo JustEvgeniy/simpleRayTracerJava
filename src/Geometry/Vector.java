@@ -34,4 +34,12 @@ public abstract class Vector {
 
     @Override
     public abstract String toString();
+
+    public double getMax() {
+        double m = data[0];
+        for (int i = 1; i < data.length; i++) {
+            m = Math.max(m,data[i]);
+        }
+        return m;
+    }
 }
