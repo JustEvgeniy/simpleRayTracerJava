@@ -6,28 +6,23 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends Canvas {
-    public static void main(String[] args) {
-        render();
-    }
-
     public static final int width = 1024;
     public static final int height = 768;
     private static BufferedImage image;
 
-    private static void render() {
-        Vec3[] frameBuffer = new Vec3[width * height];
+    public static void main(String[] args) {
+        List<SceneObject> scene = new ArrayList<>();
+        scene.add(new Sphere(new Vec3(-3, 0, -16), 2));
+        scene.add(new Sphere(new Vec3(-1, -1.5, -12), 2));
+        scene.add(new Sphere(new Vec3(1.5, -0.5, -18), 3));
+        scene.add(new Sphere(new Vec3(7, 5, -18), 4));
 
-        System.out.println("Created frameBuffer");
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                frameBuffer[j + i * height] = new Vec3((double) i / width, (double) j / height, 0.0);
-            }
-        }
-
-        System.out.println("Filled frameBuffer");
+        Renderer renderer = new Renderer(width, height, 60);
+        Vec3[] frameBuffer = renderer.render(scene);
 
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
