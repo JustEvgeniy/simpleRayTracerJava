@@ -41,12 +41,32 @@ public class Renderer {
     }
 
     private Vec3 castRay(Vec3 origin, Vec3 direction) {
-        double sphereDist = Double.MAX_VALUE;
-        for (SceneObject object : currentScene) {
-            IntersectionResult res = object.rayIntersect(origin, direction);
-            if (res.intersection)
-                return new Vec3(.4, .4, .3);
-        }
+        Intersection intersection = sceneIntersect(origin, direction);
+        if (intersection.isIntersection)
+            return intersection.material.diffuseColor;
         return BACKGROUND_COLOR;
+    }
+
+    private Intersection sceneIntersect(Vec3 origin, Vec3 direction) {
+        double spheresDist = Double.MAX_VALUE;
+
+        Intersection result = new Intersection();
+
+        for (SceneObject object : currentScene) {
+            if (object instanceof Sphere) {
+                Sphere sphere = (Sphere) object;
+                Intersection intersection = object.rayIntersect(origin, direction);
+                if (intersection.isIntersection && intersection.distance < spheresDist) {
+                    spheresDist = intersection.distance;
+                    Vec3 hit = origin.add(direction.multiply(intersection.distance));
+                    result = new Intersection(hit, hit.subtract(sphere.center).normalize(), sphere.material);
+                }
+            }
+        }
+
+        if (spheresDist < 1000)
+            return result;
+        else
+            return new Intersection();
     }
 }

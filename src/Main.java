@@ -15,11 +15,14 @@ public class Main extends Canvas {
     private static BufferedImage image;
 
     public static void main(String[] args) {
+        Material ivory = new Material(new Vec3(0.4, 0.4, 0.3));
+        Material redRubber = new Material(new Vec3(0.3, 0.1, 0.1));
+
         List<SceneObject> scene = new ArrayList<>();
-        scene.add(new Sphere(new Vec3(-3, 0, -16), 2));
-        scene.add(new Sphere(new Vec3(-1, -1.5, -12), 2));
-        scene.add(new Sphere(new Vec3(1.5, -0.5, -18), 3));
-        scene.add(new Sphere(new Vec3(7, 5, -18), 4));
+        scene.add(new Sphere(new Vec3(-3, 0, -16), 2, ivory));
+        scene.add(new Sphere(new Vec3(-1, -1.5, -12), 2, redRubber));
+        scene.add(new Sphere(new Vec3(1.5, -0.5, -18), 3, redRubber));
+        scene.add(new Sphere(new Vec3(7, 5, -18), 4, ivory));
 
         Renderer renderer = new Renderer(width, height, 60);
         Vec3[] frameBuffer = renderer.render(scene);
