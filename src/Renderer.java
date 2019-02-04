@@ -62,10 +62,26 @@ public class Renderer {
     }
 
     private Vec3 castRay(Vec3 origin, Vec3 direction) {
+        return castRay(origin, direction, 0);
+    }
+
+    private Vec3 castRay(Vec3 origin, Vec3 direction, int depth) {
         Intersection intersection = sceneIntersect(origin, direction);
-        if (!intersection.isIntersection) {
+        if (depth > 4 || !intersection.isIntersecting) {
             return BACKGROUND_COLOR;
         }
+
+        Vec3 reflectDir = reflect(direction.inverse(), intersection.normal).normalize();
+        Vec3 reflectOrgin = reflectDir.dotProduct(intersection.normal) < 0 ?
+                intersection.hit.subtract(intersection.normal.multiply(1e-3)) :
+                intersection.hit.add(intersection.normal.multiply(1e-3));
+        Vec3 reflectColor = castRay(reflectOrgin, reflectDir, depth + 1);
+
+        Vec3 refractDir = refract(direction, intersection.normal, intersection.material.refractiveIndex).normalize();
+        Vec3 refractOrigin = refractDir.dotProduct(intersection.normal) < 0 ?
+                intersection.hit.subtract(intersection.normal.multiply(1e-3)) :
+                intersection.hit.add(intersection.normal.multiply(1e-3));
+        Vec3 refractColor = castRay(refractOrigin, refractDir, depth + 1);
 
         double diffuseLightIntensity = 0;
         double specularLightIntensity = 0;
@@ -89,12 +105,19 @@ public class Renderer {
                     intersection.material.specularExponent);
         }
 
-        return intersection.material.diffuseColor
+        Vec3 diffuseComponent = intersection.material.diffuseColor
                 .multiply(diffuseLightIntensity)
-                .multiply(intersection.material.albedo[0])
-                .add(new Vec3(1, 1, 1).
-                        multiply(specularLightIntensity).
-                        multiply(intersection.material.albedo[1]));
+                .multiply(intersection.material.albedo[0]);
+
+        Vec3 specularComponent = new Vec3(1, 1, 1)
+                .multiply(specularLightIntensity)
+                .multiply(intersection.material.albedo[1]);
+
+        Vec3 reflectionComponent = reflectColor.multiply(intersection.material.albedo[2]);
+
+        Vec3 refractionComponent = refractColor.multiply(intersection.material.albedo[3]);
+
+        return diffuseComponent.add(specularComponent).add(reflectionComponent).add(refractionComponent);
     }
 
     private Intersection sceneIntersect(Vec3 origin, Vec3 direction) {
@@ -104,7 +127,7 @@ public class Renderer {
 
         for (Sphere sphere : currentScene.spheres) {
             Intersection intersection = sphere.rayIntersect(origin, direction);
-            if (intersection.isIntersection && intersection.distance < objectDistance) {
+            if (intersection.isIntersecting && intersection.distance < objectDistance) {
                 objectDistance = intersection.distance;
                 Vec3 hit = origin.add(direction.multiply(intersection.distance));
                 result = new Intersection(hit, hit.subtract(sphere.center).normalize(), sphere.material);
@@ -114,7 +137,24 @@ public class Renderer {
         return result;
     }
 
-    public Vec3 reflect(Vec3 I, Vec3 N) {
+    private Vec3 reflect(Vec3 I, Vec3 N) {
         return N.multiply(2).multiply(I.dotProduct(N)).subtract(I);
+    }
+
+    private Vec3 refract(Vec3 I, Vec3 N, double refractiveIndex) {
+        double cosi = -I.dotProduct(N);
+        double etai = 1;
+        double etat = refractiveIndex;
+        Vec3 n = N;
+        if (cosi < 0) {
+            cosi = -cosi;
+            n = N.inverse();
+            double t = etai;
+            etai = etat;
+            etat = t;
+        }
+        double eta = etai / etat;
+        double k = 1 - eta * eta * (1 - cosi * cosi);
+        return k < 0 ? new Vec3(0, 0, 0) : I.multiply(eta).add(n.multiply(eta * cosi - Math.sqrt(k)));
     }
 }

@@ -6,7 +6,7 @@ import java.io.IOException;
 public class ImageWriter {
     public static void saveImage(BufferedImage image, String filename) {
         try {
-            System.out.println("Saving image");
+            System.out.println("Saving image: " + filename + ".png");
 
             ImageIO.write(image, "PNG", new File(filename + ".png"));
 
