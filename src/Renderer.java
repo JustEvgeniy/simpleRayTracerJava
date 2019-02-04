@@ -7,6 +7,7 @@ public class Renderer {
     private int height;
     private int fovDeg;
     private List<SceneObject> currentScene;
+    private List<Light> currentLights;
 
     private static final Vec3 BACKGROUND_COLOR = new Vec3(.4, .9, 1);
 
@@ -16,9 +17,10 @@ public class Renderer {
         this.fovDeg = fovDeg;
     }
 
-    public Vec3[] render(List<SceneObject> scene) {
-        Vec3[] frameBuffer = new Vec3[width * height];
+    public Vec3[] render(List<SceneObject> scene, List<Light> lights) {
         currentScene = scene;
+        currentLights = lights;
+        Vec3[] frameBuffer = new Vec3[width * height];
 
         System.out.println("Created frameBuffer\n" + width + 'x' + height + '=' + width * height + " pixels");
 
@@ -42,9 +44,17 @@ public class Renderer {
 
     private Vec3 castRay(Vec3 origin, Vec3 direction) {
         Intersection intersection = sceneIntersect(origin, direction);
-        if (intersection.isIntersection)
-            return intersection.material.diffuseColor;
-        return BACKGROUND_COLOR;
+        if (!intersection.isIntersection) {
+            return BACKGROUND_COLOR;
+        }
+        double diffuseLightIntensity = 0;
+
+        for (Light light : currentLights) {
+            Vec3 lightDir = light.position.subtract(intersection.hit).normalize();
+            diffuseLightIntensity += light.intensity * Math.max(0, lightDir.dotProduct(intersection.normal));
+        }
+
+        return intersection.material.diffuseColor.multiply(diffuseLightIntensity);
     }
 
     private Intersection sceneIntersect(Vec3 origin, Vec3 direction) {

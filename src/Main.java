@@ -24,19 +24,22 @@ public class Main extends Canvas {
         scene.add(new Sphere(new Vec3(1.5, -0.5, -18), 3, redRubber));
         scene.add(new Sphere(new Vec3(7, 5, -18), 4, ivory));
 
+        List<Light> lights = new ArrayList<>();
+        lights.add(new Light(new Vec3(-20, 20, 20), 1.5));
+
         Renderer renderer = new Renderer(width, height, 60);
-        Vec3[] frameBuffer = renderer.render(scene);
+        Vec3[] frameBuffer = renderer.render(scene, lights);
 
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 int color = 0;
-                color += 255 * frameBuffer[j + i * height].getX();
+                color += 255 * Math.min(1, frameBuffer[j + i * height].getX());
                 color <<= 8;
-                color += 255 * frameBuffer[j + i * height].getY();
+                color += 255 * Math.min(1, frameBuffer[j + i * height].getY());
                 color <<= 8;
-                color += 255 * frameBuffer[j + i * height].getZ();
+                color += 255 * Math.min(1, frameBuffer[j + i * height].getZ());
                 image.setRGB(i, j, color);
             }
         }
