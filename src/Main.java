@@ -2,8 +2,6 @@ import Geometry.Vec3;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Main extends Canvas {
     public static final int width = 1024;
@@ -22,19 +20,18 @@ public class Main extends Canvas {
         Material ivory = new Material(new double[]{.6, .3}, new Vec3(0.4, 0.4, 0.3), 50);
         Material redRubber = new Material(new double[]{.9, .1}, new Vec3(0.3, 0.1, 0.1), 10);
 
-        List<SceneObject> scene = new ArrayList<>();
-        scene.add(new Sphere(new Vec3(-3, 0, -16), 2, ivory));
-        scene.add(new Sphere(new Vec3(-1, -1.5, -12), 2, redRubber));
-        scene.add(new Sphere(new Vec3(1.5, -0.5, -18), 3, redRubber));
-        scene.add(new Sphere(new Vec3(7, 5, -18), 4, ivory));
+        Scene scene = new Scene();
+        scene.addSphere(-3, 0, -16, 2, ivory);
+        scene.addSphere(-1, -1.5, -12, 2, redRubber);
+        scene.addSphere(1.5, -0.5, -18, 3, redRubber);
+        scene.addSphere(7, 5, -18, 4, ivory);
 
-        List<Light> lights = new ArrayList<>();
-        lights.add(new Light(new Vec3(-20, 20, 20), 1.5));
-        lights.add(new Light(new Vec3(30, 50, -25), 1.8));
-        lights.add(new Light(new Vec3(30, 20, 30), 1.7));
+        scene.addLight(-20, 20, 20, 1.5);
+        scene.addLight(30, 50, -25, 1.8);
+        scene.addLight(30, 20, 30, 1.7);
 
         Renderer renderer = new Renderer(width, height, 60);
-        renderer.render(scene, lights, canvas);
+        renderer.render(scene, canvas);
 
         ImageWriter.saveImage(renderer.getImage(), "out");
     }

@@ -2,17 +2,15 @@ import Geometry.Vec3;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 public class Renderer {
     private BufferedImage image;
     private int width;
     private int height;
     private int fovDeg;
-    private List<SceneObject> currentScene;
-    private List<Light> currentLights;
+    private Scene currentScene;
 
-    private static final Vec3 BACKGROUND_COLOR = new Vec3(.4, .9, 1);
+    private static final Vec3 BACKGROUND_COLOR = new Vec3(.2, .7, .8);
 
     public Renderer(int width, int height, int fovDeg) {
         this.width = width;
@@ -25,9 +23,8 @@ public class Renderer {
         return image;
     }
 
-    public void render(List<SceneObject> scene, List<Light> lights, Canvas canvas) {
+    public void render(Scene scene, Canvas canvas) {
         currentScene = scene;
-        currentLights = lights;
         Graphics graphics = canvas.getGraphics();
 
         System.out.println("Rendering\n" + width + 'x' + height + '=' + width * height + " pixels");
@@ -69,7 +66,7 @@ public class Renderer {
         double diffuseLightIntensity = 0;
         double specularLightIntensity = 0;
 
-        for (Light light : currentLights) {
+        for (Light light : currentScene.lights) {
             Vec3 lightDir = light.position.subtract(intersection.hit).normalize();
 
             diffuseLightIntensity += light.intensity * Math.max(0, lightDir.dotProduct(intersection.normal));
@@ -87,26 +84,20 @@ public class Renderer {
     }
 
     private Intersection sceneIntersect(Vec3 origin, Vec3 direction) {
-        double spheresDist = Double.MAX_VALUE;
+        double objectDistance = Double.MAX_VALUE;
 
         Intersection result = new Intersection();
 
-        for (SceneObject object : currentScene) {
-            if (object instanceof Sphere) {
-                Sphere sphere = (Sphere) object;
-                Intersection intersection = object.rayIntersect(origin, direction);
-                if (intersection.isIntersection && intersection.distance < spheresDist) {
-                    spheresDist = intersection.distance;
-                    Vec3 hit = origin.add(direction.multiply(intersection.distance));
-                    result = new Intersection(hit, hit.subtract(sphere.center).normalize(), sphere.material);
-                }
+        for (Sphere sphere : currentScene.spheres) {
+            Intersection intersection = sphere.rayIntersect(origin, direction);
+            if (intersection.isIntersection && intersection.distance < objectDistance) {
+                objectDistance = intersection.distance;
+                Vec3 hit = origin.add(direction.multiply(intersection.distance));
+                result = new Intersection(hit, hit.subtract(sphere.center).normalize(), sphere.material);
             }
         }
 
-        if (spheresDist < 1000)
-            return result;
-        else
-            return new Intersection();
+        return result;
     }
 
     public Vec3 reflect(Vec3 I, Vec3 N) {
