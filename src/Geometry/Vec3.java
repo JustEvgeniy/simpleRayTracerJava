@@ -3,7 +3,7 @@ package Geometry;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Vec3 extends Vector {
+public final class Vec3 extends Vector {
     public Vec3(double x, double y, double z) {
         data = new double[3];
         data[0] = x;
@@ -64,6 +64,21 @@ public class Vec3 extends Vector {
                 data[1] * vec3.data[2] - data[2] * vec3.data[1],
                 data[2] * vec3.data[0] - data[0] * vec3.data[2],
                 data[0] * vec3.data[1] - data[1] * vec3.data[0]);
+    }
+
+    @Override
+    public Vec3 inverse() {
+        return (Vec3) super.inverse();
+    }
+
+    @Override
+    public Vec3 normalize(double newLength) {
+        return (Vec3) super.normalize(newLength);
+    }
+
+    @Override
+    public Vec3 normalize() {
+        return (Vec3) super.normalize();
     }
 
     @Override

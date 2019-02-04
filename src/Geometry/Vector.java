@@ -10,17 +10,17 @@ public abstract class Vector {
 
     public abstract Vector multiply(double number);
 
-    public final Vector inverse() {
+    public Vector inverse() {
         return multiply(-1.0);
     }
 
     public abstract double length();
 
-    public final Vector normalize(double newLength) {
+    public Vector normalize(double newLength) {
         return multiply(newLength / length());
     }
 
-    public final Vector normalize() {
+    public Vector normalize() {
         return normalize(1.0);
     }
 

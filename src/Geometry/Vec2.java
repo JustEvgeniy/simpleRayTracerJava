@@ -3,7 +3,7 @@ package Geometry;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class Vec2 extends Vector {
+public final class Vec2 extends Vector {
     public Vec2(double x, double y) {
         data = new double[2];
         data[0] = x;
@@ -37,6 +37,21 @@ public class Vec2 extends Vector {
         return new Vec2(
                 data[0] * number,
                 data[1] * number);
+    }
+
+    @Override
+    public Vec2 inverse() {
+        return (Vec2) super.inverse();
+    }
+
+    @Override
+    public Vec2 normalize(double newLength) {
+        return (Vec2) super.normalize(newLength);
+    }
+
+    @Override
+    public Vec2 normalize() {
+        return (Vec2) super.normalize();
     }
 
     @Override
