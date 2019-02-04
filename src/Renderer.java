@@ -72,6 +72,16 @@ public class Renderer {
 
         for (Light light : currentScene.lights) {
             Vec3 lightDir = light.position.subtract(intersection.hit).normalize();
+            double lightDistance = light.position.subtract(intersection.hit).length();
+
+            Vec3 shadowOrigin = lightDir.dotProduct(intersection.normal) < 0 ?
+                    intersection.hit.subtract(intersection.normal.multiply(1e-3)) :
+                    intersection.hit.add(intersection.normal.multiply(1e-3));
+
+            Intersection intersectionShadows = sceneIntersect(shadowOrigin, lightDir);
+
+            if (intersectionShadows.isIntersecting && intersection.hit.subtract(shadowOrigin).length() < lightDistance)
+                continue;
 
             diffuseLightIntensity += light.intensity * Math.max(0, lightDir.dotProduct(intersection.normal));
             specularLightIntensity += Math.pow(
