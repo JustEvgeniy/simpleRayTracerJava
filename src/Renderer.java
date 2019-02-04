@@ -11,23 +11,24 @@ public class Renderer {
     private int fovDeg;
     private List<SceneObject> currentScene;
     private List<Light> currentLights;
-    private Graphics g;
-    private Canvas c;
 
     private static final Vec3 BACKGROUND_COLOR = new Vec3(.4, .9, 1);
 
-    public Renderer(Canvas c, Graphics g, BufferedImage image, int width, int height, int fovDeg) {
-        this.g = g;
-        this.c = c;
-        this.image = image;
+    public Renderer(int width, int height, int fovDeg) {
         this.width = width;
         this.height = height;
         this.fovDeg = fovDeg;
+        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     }
 
-    public void render(List<SceneObject> scene, List<Light> lights) {
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void render(List<SceneObject> scene, List<Light> lights, Canvas canvas) {
         currentScene = scene;
         currentLights = lights;
+        Graphics graphics = canvas.getGraphics();
 
         System.out.println("Rendering\n" + width + 'x' + height + '=' + width * height + " pixels");
 
@@ -53,7 +54,7 @@ public class Renderer {
                 color += 255 * vec3.getZ();
                 image.setRGB(i, j, color);
             }
-            g.drawImage(image, 0, 0, c);
+            graphics.drawImage(image, 0, 0, canvas);
         }
 
         System.out.println("Finished rendering");
