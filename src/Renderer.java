@@ -19,6 +19,10 @@ public class Renderer {
         this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     }
 
+    public void setFov(int fovDeg) {
+        this.fovDeg = fovDeg;
+    }
+
     public BufferedImage getImage() {
         return image;
     }
@@ -71,7 +75,7 @@ public class Renderer {
 
             diffuseLightIntensity += light.intensity * Math.max(0, lightDir.dotProduct(intersection.normal));
             specularLightIntensity += Math.pow(
-                    reflect(lightDir, intersection.normal).dotProduct(direction.inverse()),
+                    Math.max(0, reflect(lightDir, intersection.normal).dotProduct(direction.inverse())),
                     intersection.material.specularExponent);
         }
 
