@@ -25,13 +25,13 @@ public class Main {
 
         Material[] materials = new Material[]{ivory, glass, redRubber, mirror};
 
-//        for (int i = -10; i <= 10; i += 2) {
-//            for (int j = -10; j <= 10; j += 2) {
-//                for (int k = 0; k < 2; k++) {
-//                    scene.addSphere(i, j, k * 3 - 22, 1, materials[(int) (Math.random() * 123456) % materials.length]);
-//                }
-//            }
-//        }
+        for (int i = -10; i <= 10; i += 2) {
+            for (int j = -10; j <= 10; j += 2) {
+                for (int k = 0; k < 2; k++) {
+                    scene.addSphere(i, j, k * 3 - 22, 1, materials[(int) (Math.random() * 123456) % materials.length]);
+                }
+            }
+        }
 
         scene.addLight(-20, 20, 20, 1.5);
         scene.addLight(30, 50, -25, 1.8);
