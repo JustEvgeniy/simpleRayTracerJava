@@ -31,7 +31,8 @@ public class Renderer {
         currentScene = scene;
         Graphics graphics = canvas.getGraphics();
 
-        System.out.println("Rendering\n" + width + 'x' + height + '=' + width * height + " pixels");
+        System.out.println("Rendering: " + fovDeg + " fov\n" +
+                width + 'x' + height + '=' + width * height + " pixels");
 
         Vec3 center = new Vec3(0, 0, 0);
 

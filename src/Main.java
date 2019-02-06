@@ -4,9 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Main {
-    public static final int width = 1024;
-    public static final int height = 768;
-
     public static void main(String[] args) {
         Material ivory =
                 new Material(1.0, new double[]{0.6, 0.3, 0.1, 0.0}, new Vec3(0.4, 0.4, 0.3), 50);
@@ -27,7 +24,7 @@ public class Main {
 
         for (int i = -10; i <= 10; i += 2) {
             for (int j = -10; j <= 10; j += 2) {
-                for (int k = 0; k < 2; k++) {
+                for (int k = 0; k < 1; k++) {
                     scene.addSphere(i, j, k * 3 - 22, 1, materials[(int) (Math.random() * 123456) % materials.length]);
                 }
             }
@@ -39,25 +36,42 @@ public class Main {
 
         scene.setEnvmap("data/envmap.jpg");
 
-        Renderer renderer = new Renderer(width, height, 60);
+        int width = 1024;
+        int height = 768;
 
-        Canvas canvas1 = setupGui("60 fov");
-        renderer.render(scene, canvas1);
-        ImageWriter.saveImage(renderer.getImage(), "out60fov");
+        renderWithResolution(width, height, scene);
 
-        Canvas canvas2 = setupGui("90 fov");
-        renderer.setFov(90);
-        renderer.render(scene, canvas2);
-        ImageWriter.saveImage(renderer.getImage(), "out90fov");
+        width = 1920;
+        height = 1080;
 
-        Canvas canvas3 = setupGui("30 fov");
-        renderer.setFov(30);
-        renderer.render(scene, canvas3);
-        ImageWriter.saveImage(renderer.getImage(), "out30fov");
+        renderWithResolution(width, height, scene);
+
+        width = 1920 * 2;
+        height = 1080 * 2;
+
+        renderWithResolution(width, height, scene);
     }
 
-    private static Canvas setupGui(String title) {
-        JFrame frame = new JFrame("Rendered image | " + title);
+    private static void renderWithResolution(int width, int height, Scene scene) {
+        Renderer renderer = new Renderer(width, height, 60);
+
+        Canvas canvas1 = setupGui(width, height, "60 fov");
+        renderer.render(scene, canvas1);
+        ImageWriter.saveImage(renderer.getImage(), "out60fov" + width + 'x' + height);
+
+        Canvas canvas2 = setupGui(width, height, "90 fov");
+        renderer.setFov(90);
+        renderer.render(scene, canvas2);
+        ImageWriter.saveImage(renderer.getImage(), "out90fov" + width + 'x' + height);
+
+        Canvas canvas3 = setupGui(width, height, "30 fov");
+        renderer.setFov(30);
+        renderer.render(scene, canvas3);
+        ImageWriter.saveImage(renderer.getImage(), "out30fov" + width + 'x' + height);
+    }
+
+    private static Canvas setupGui(int width, int height, String title) {
+        JFrame frame = new JFrame("Rendered image | " + title + " | " + width + 'x' + height);
         Canvas canvas = new Canvas();
 
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

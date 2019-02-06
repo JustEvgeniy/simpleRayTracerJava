@@ -38,7 +38,7 @@ public abstract class Vector {
     public double getMax() {
         double m = data[0];
         for (int i = 1; i < data.length; i++) {
-            m = Math.max(m,data[i]);
+            m = Math.max(m, data[i]);
         }
         return m;
     }
