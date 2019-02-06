@@ -1,3 +1,5 @@
+package Renderer;
+
 import Geometry.Vec3;
 
 import javax.imageio.ImageIO;
@@ -5,25 +7,34 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class Envmap {
+class Envmap {
     private BufferedImage image;
+    private static final Vec3 BACKGROUND_COLOR = new Vec3(.2, .7, .8);
 
-    public Envmap(String filename) {
+    Envmap() {
+    }
+
+    Envmap(String filename) {
         try {
             System.out.println("Loading envmap " + filename);
 
             image = ImageIO.read(new File(filename));
 
-            System.out.println("Envmap loaded");
+            System.out.println("Envmap loaded [" + image.getWidth() + "x" + image.getHeight() + "]");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Vec3 get(Vec3 dir) {
+    Vec3 get(Vec3 dir) {
+        if (image == null) {
+            return BACKGROUND_COLOR;
+        }
+
         int x = (int) ((Math.atan2(dir.getZ(), dir.getX()) / (2 * Math.PI) + 0.5) * image.getWidth());
         int y = (int) (Math.acos(dir.getY()) / Math.PI * image.getHeight());
 
+        //TODO: optimize
         int pixel = image.getRGB(x, y);
         pixel &= (1 << 24) - 1;
         double B = pixel % (1 << 8);

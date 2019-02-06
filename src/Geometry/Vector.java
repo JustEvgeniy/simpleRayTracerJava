@@ -1,30 +1,30 @@
 package Geometry;
 
 public abstract class Vector {
-    protected double[] data;
-    public static final double EPS = 1e-9;
+    double[] data;
+    static final double EPS = 1e-9;
 
     public abstract Vector add(Vector vector);
 
-    public abstract Vector subtract(Vector vector);
+    public abstract Vector sub(Vector vector);
 
-    public abstract Vector multiply(double number);
+    public abstract Vector mul(double number);
 
     public Vector inverse() {
-        return multiply(-1.0);
+        return mul(-1.0);
     }
 
     public abstract double length();
 
     public Vector normalize(double newLength) {
-        return multiply(newLength / length());
+        return mul(newLength / length());
     }
 
     public Vector normalize() {
         return normalize(1.0);
     }
 
-    public abstract double dotProduct(Vector vector);
+    public abstract double dot(Vector vector);
 
     @Override
     public abstract boolean equals(Object o);

@@ -5,10 +5,7 @@ import java.util.Objects;
 
 public final class Vec3 extends Vector {
     public Vec3(double x, double y, double z) {
-        data = new double[3];
-        data[0] = x;
-        data[1] = y;
-        data[2] = z;
+        data = new double[]{x, y, z};
     }
 
     public double getX() {
@@ -32,7 +29,7 @@ public final class Vec3 extends Vector {
     }
 
     @Override
-    public Vec3 subtract(Vector vector) {
+    public Vec3 sub(Vector vector) {
         return new Vec3(
                 data[0] - vector.data[0],
                 data[1] - vector.data[1],
@@ -40,7 +37,7 @@ public final class Vec3 extends Vector {
     }
 
     @Override
-    public Vec3 multiply(double number) {
+    public Vec3 mul(double number) {
         return new Vec3(
                 data[0] * number,
                 data[1] * number,
@@ -53,13 +50,13 @@ public final class Vec3 extends Vector {
     }
 
     @Override
-    public double dotProduct(Vector vector) {
+    public double dot(Vector vector) {
         return data[0] * vector.data[0] +
                 data[1] * vector.data[1] +
                 data[2] * vector.data[2];
     }
 
-    public Vec3 crossProduct(Vec3 vec3) {
+    Vec3 crossProduct(Vec3 vec3) {
         return new Vec3(
                 data[1] * vec3.data[2] - data[2] * vec3.data[1],
                 data[2] * vec3.data[0] - data[0] * vec3.data[2],

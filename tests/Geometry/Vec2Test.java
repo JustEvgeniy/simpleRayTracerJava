@@ -29,14 +29,14 @@ class Vec2Test {
         Vec2 vector1 = new Vec2(3.0, 2.5);
         Vec2 vector2 = new Vec2(-1.2, 4.0);
 
-        assertEquals(new Vec2(4.2, -1.5), vector1.subtract(vector2));
+        assertEquals(new Vec2(4.2, -1.5), vector1.sub(vector2));
     }
 
     @Test
     void multiply() {
         Vec2 vector2 = new Vec2(3.333, -123.0);
 
-        assertEquals(new Vec2(-9.999, 369.0), vector2.multiply(-3.0));
+        assertEquals(new Vec2(-9.999, 369.0), vector2.mul(-3.0));
     }
 
     @Test
@@ -67,7 +67,7 @@ class Vec2Test {
         Vec2 vector1 = new Vec2(3.0, 4.0);
         Vec2 vector2 = new Vec2(0.1234, -43.0);
 
-        assertEquals(-171.6298, vector1.dotProduct(vector2));
+        assertEquals(-171.6298, vector1.dot(vector2));
     }
 
     @Test
@@ -80,7 +80,7 @@ class Vec2Test {
         assertEquals(new Vec2(.34, .45), vector2);
         assertEquals(new Vec2(1.34, 1.45), vectorAdd);
 
-        Vec2 vectorSub = vector.subtract(vector2);
+        Vec2 vectorSub = vector.sub(vector2);
 
         assertEquals(new Vec2(1.0, 1.0), vector);
         assertEquals(new Vec2(.34, .45), vector2);

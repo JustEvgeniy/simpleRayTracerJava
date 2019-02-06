@@ -1,31 +1,40 @@
 import Geometry.Vec3;
+import Renderer.Renderer;
+import Renderer.Scene;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class Main {
+    private static final boolean withGui = true;
+    private static final boolean withImage = true;
+    private static final boolean withSphereWall = true;
+
     public static void main(String[] args) {
-        Material ivory =
-                new Material(1.0, new double[]{0.6, 0.3, 0.1, 0.0}, new Vec3(0.4, 0.4, 0.3), 50);
-        Material glass =
-                new Material(1.5, new double[]{0.0, 0.5, 0.1, 0.8}, new Vec3(0.6, 0.7, 0.8), 125);
-        Material redRubber =
-                new Material(1.0, new double[]{0.9, 0.1, 0.0, 0.0}, new Vec3(0.3, 0.1, 0.1), 10);
-        Material mirror =
-                new Material(1.0, new double[]{0.0, 10.0, 0.8, 0.0}, new Vec3(1.0, 1.0, 1.0), 1425);
+        if (!withGui && !withImage) {
+            throw new RuntimeException("Wrong settings");
+        }
 
         Scene scene = new Scene();
-        scene.addSphere(-3, 0, -16, 2, ivory);
-        scene.addSphere(-1, -1.5, -12, 2, glass);
-        scene.addSphere(1.5, -0.5, -18, 3, redRubber);
-        scene.addSphere(7, 5, -18, 4, mirror);
 
-        Material[] materials = new Material[]{ivory, glass, redRubber, mirror};
+        scene.addMaterial("ivory", 1, .6, .3, .1, 0, new Vec3(0.4, 0.4, 0.3), 50);
+        scene.addMaterial("glass", 1.5, 0, .5, .1, .8, new Vec3(0.6, 0.7, 0.8), 125);
+        scene.addMaterial("redRubber", 1, .9, .1, 0, 0, new Vec3(0.3, 0.1, 0.1), 10);
+        scene.addMaterial("mirror", 1, 0, 10, .8, 0, new Vec3(1.0, 1.0, 1.0), 1425);
+        List<String> materials = scene.getMaterialNames();
 
-        for (int i = -10; i <= 10; i += 2) {
-            for (int j = -10; j <= 10; j += 2) {
-                for (int k = 0; k < 1; k++) {
-                    scene.addSphere(i, j, k * 3 - 22, 1, materials[(int) (Math.random() * 123456) % materials.length]);
+        scene.addSphere(-3, 0, -16, 2, "ivory");
+        scene.addSphere(-1, -1.5, -12, 2, "glass");
+        scene.addSphere(1.5, -0.5, -18, 3, "redRubber");
+        scene.addSphere(7, 5, -18, 4, "mirror");
+
+        if (withSphereWall) {
+            for (int i = -10; i <= 10; i += 2) {
+                for (int j = -10; j <= 10; j += 2) {
+                    for (int k = 0; k < 1; k++) {
+                        scene.addSphere(i, j, k * 3 - 22, 1, materials.get((int) (Math.random() * 123456) % materials.size()));
+                    }
                 }
             }
         }
@@ -34,40 +43,35 @@ public class Main {
         scene.addLight(30, 50, -25, 1.5);
         scene.addLight(30, 20, 30, 1.9);
 
-        scene.setEnvmap("data/envmap.jpg");
+        scene.loadEnvmap("data/envmap.jpg");
 
-        int width = 1024/2;
-        int height = 768/2;
-
-        renderWithResolution(width, height, scene);
-
-//        width = 1920;
-//        height = 1080;
-//
-//        renderWithResolution(width, height, scene);
-//
-//        width = 1920 * 2;
-//        height = 1080 * 2;
-//
-//        renderWithResolution(width, height, scene);
+        renderWithResolution(1024, 768, scene);
+        renderWithResolution(1920, 1080, scene);
+        renderWithResolution(1920 * 2, 1080 * 2, scene);
     }
 
     private static void renderWithResolution(int width, int height, Scene scene) {
-        Renderer renderer = new Renderer(width, height, 60);
+        Renderer renderer = new Renderer();
+        renderer.setSize(width, height);
 
-        Canvas canvas1 = setupGui(width, height, "60 fov");
-        renderer.render(scene, canvas1);
-        ImageWriter.saveImage(renderer.getImage(), "out60fov" + width + 'x' + height);
+        renderer.setScene(scene);
 
-        Canvas canvas2 = setupGui(width, height, "90 fov");
-        renderer.setFov(90);
-        renderer.render(scene, canvas2);
-        ImageWriter.saveImage(renderer.getImage(), "out90fov" + width + 'x' + height);
+        int[] fovs = new int[]{60, 90, 30};
+//        int[] fovs = new int[]{60};
 
-        Canvas canvas3 = setupGui(width, height, "30 fov");
-        renderer.setFov(30);
-        renderer.render(scene, canvas3);
-        ImageWriter.saveImage(renderer.getImage(), "out30fov" + width + 'x' + height);
+        for (int fov : fovs) {
+            if (withGui) {
+                Canvas canvas = setupGui(width, height, fov + " fov");
+                renderer.setGraphics(canvas.getGraphics());
+            }
+
+            renderer.setFov(fov);
+            renderer.render();
+
+            if (withImage) {
+                ImageWriter.saveImage(renderer.getImage(), "out" + fov + "fov" + width + 'x' + height);
+            }
+        }
     }
 
     private static Canvas setupGui(int width, int height, String title) {

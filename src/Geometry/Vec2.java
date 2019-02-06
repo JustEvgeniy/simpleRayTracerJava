@@ -5,9 +5,7 @@ import java.util.Objects;
 
 public final class Vec2 extends Vector {
     public Vec2(double x, double y) {
-        data = new double[2];
-        data[0] = x;
-        data[1] = y;
+        data = new double[]{x, y};
     }
 
     public double getX() {
@@ -26,14 +24,14 @@ public final class Vec2 extends Vector {
     }
 
     @Override
-    public Vec2 subtract(Vector vector) {
+    public Vec2 sub(Vector vector) {
         return new Vec2(
                 data[0] - vector.data[0],
                 data[1] - vector.data[1]);
     }
 
     @Override
-    public Vec2 multiply(double number) {
+    public Vec2 mul(double number) {
         return new Vec2(
                 data[0] * number,
                 data[1] * number);
@@ -60,7 +58,7 @@ public final class Vec2 extends Vector {
     }
 
     @Override
-    public double dotProduct(Vector vector) {
+    public double dot(Vector vector) {
         return data[0] * vector.data[0] + data[1] * vector.data[1];
     }
 

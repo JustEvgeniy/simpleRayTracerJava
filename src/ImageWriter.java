@@ -3,8 +3,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class ImageWriter {
-    public static void saveImage(BufferedImage image, String filename) {
+class ImageWriter {
+    static void saveImage(BufferedImage image, String filename) {
         try {
             System.out.println("Saving image: " + filename + ".png");
 
