@@ -33,9 +33,11 @@ public class Main {
             }
         }
 
-        scene.addLight(-20, 20, 20, 1.5);
-        scene.addLight(30, 50, -25, 1.8);
-        scene.addLight(30, 20, 30, 1.7);
+        scene.addLight(-20, 20, 20, 1.3);
+        scene.addLight(30, 50, -25, 1.5);
+        scene.addLight(30, 20, 30, 1.9);
+
+        scene.setEnvmap("data/envmap.jpg");
 
         Renderer renderer = new Renderer(width, height, 60);
 

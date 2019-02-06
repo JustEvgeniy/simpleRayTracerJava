@@ -68,7 +68,7 @@ public class Renderer {
     private Vec3 castRay(Vec3 origin, Vec3 direction, int depth) {
         Intersection intersection = sceneIntersect(origin, direction);
         if (depth > 4 || !intersection.isIntersecting) {
-            return BACKGROUND_COLOR;
+            return currentScene.envmap.get(direction);
         }
 
         Vec3 reflectDir = reflect(direction.inverse(), intersection.normal).normalize();
@@ -130,7 +130,23 @@ public class Renderer {
             if (intersection.isIntersecting && intersection.distance < objectDistance) {
                 objectDistance = intersection.distance;
                 Vec3 hit = origin.add(direction.multiply(intersection.distance));
-                result = new Intersection(hit, hit.subtract(sphere.center).normalize(), sphere.material);
+                result = new Intersection(
+                        hit,
+                        hit.subtract(sphere.center).normalize(),
+                        sphere.material);
+            }
+        }
+
+        if (Math.abs(direction.getY()) > 1e-3) {
+            double d = -(origin.getY() + 4) / direction.getY();
+            Vec3 pt = origin.add(direction.multiply(d));
+            if (d > 0 && d < objectDistance &&
+                    pt.getX() > -10 && pt.getX() < 10 &&
+                    pt.getZ() > -30 && pt.getZ() < -10) {
+                result = new Intersection(pt, new Vec3(0, 1, 0),
+                        new Material(((int) (.5 * pt.getX() + 1000) + (int) (.5 * pt.getZ())) % 2 == 1 ?
+                                new Vec3(.3, .3, .3) :
+                                new Vec3(.3, .2, .1)));
             }
         }
 
@@ -141,20 +157,25 @@ public class Renderer {
         return N.multiply(2).multiply(I.dotProduct(N)).subtract(I);
     }
 
-    private Vec3 refract(Vec3 I, Vec3 N, double refractiveIndex) {
+    private Vec3 refract(Vec3 I, Vec3 N, double eta_t) {
+        return refract(I, N, eta_t, 1);
+    }
+
+    private Vec3 refract(Vec3 I, Vec3 N, double eta_t, double eta_i) {
         double cosi = -I.dotProduct(N);
-        double etai = 1;
-        double etat = refractiveIndex;
-        Vec3 n = N;
-        if (cosi < 0) {
-            cosi = -cosi;
-            n = N.inverse();
-            double t = etai;
-            etai = etat;
-            etat = t;
+
+        if (cosi > 1 || cosi < -1) {
+            System.out.println("DEBUG: cosi = " + cosi);
+            System.out.println("DEBUG: I = " + I);
+            System.out.println("DEBUG: N = " + N);
         }
-        double eta = etai / etat;
+
+        if (cosi < 0) {
+            return refract(I, N.inverse(), eta_i, eta_t);
+        }
+
+        double eta = eta_i / eta_t;
         double k = 1 - eta * eta * (1 - cosi * cosi);
-        return k < 0 ? new Vec3(0, 0, 0) : I.multiply(eta).add(n.multiply(eta * cosi - Math.sqrt(k)));
+        return k < 0 ? new Vec3(1, 0, 0) : I.multiply(eta).add(N.multiply(eta * cosi - Math.sqrt(k)));
     }
 }

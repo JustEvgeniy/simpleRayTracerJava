@@ -6,6 +6,7 @@ import java.util.List;
 public class Scene {
     public List<Light> lights = new ArrayList<>();
     public List<Sphere> spheres = new ArrayList<>();
+    public Envmap envmap;
 
     void addLight(double x, double y, double z, double i) {
         lights.add(new Light(new Vec3(x, y, z), i));
@@ -13,5 +14,9 @@ public class Scene {
 
     void addSphere(double x, double y, double z, double r, Material m) {
         spheres.add(new Sphere(new Vec3(x, y, z), r, m));
+    }
+
+    void setEnvmap(String filename) {
+        envmap = new Envmap(filename);
     }
 }
