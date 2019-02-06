@@ -36,20 +36,20 @@ public class Main {
 
         scene.setEnvmap("data/envmap.jpg");
 
-        int width = 1024;
-        int height = 768;
+        int width = 1024/2;
+        int height = 768/2;
 
         renderWithResolution(width, height, scene);
 
-        width = 1920;
-        height = 1080;
-
-        renderWithResolution(width, height, scene);
-
-        width = 1920 * 2;
-        height = 1080 * 2;
-
-        renderWithResolution(width, height, scene);
+//        width = 1920;
+//        height = 1080;
+//
+//        renderWithResolution(width, height, scene);
+//
+//        width = 1920 * 2;
+//        height = 1080 * 2;
+//
+//        renderWithResolution(width, height, scene);
     }
 
     private static void renderWithResolution(int width, int height, Scene scene) {

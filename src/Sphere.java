@@ -17,7 +17,7 @@ public class Sphere implements SceneObject {
         double tca = L.dotProduct(direction);
         double d2 = L.dotProduct(L) - tca * tca;
         if (d2 > radius * radius) {
-            return new Intersection();
+            return null;
         }
 
         double thc = Math.sqrt(radius * radius - d2);
@@ -25,7 +25,7 @@ public class Sphere implements SceneObject {
         if (intersectionDist < 0)
             intersectionDist = tca + thc;
         if (intersectionDist < 0)
-            return new Intersection();
+            return null;
         return new Intersection(intersectionDist);
     }
 }

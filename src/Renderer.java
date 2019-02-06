@@ -67,22 +67,31 @@ public class Renderer {
     }
 
     private Vec3 castRay(Vec3 origin, Vec3 direction, int depth) {
-        Intersection intersection = sceneIntersect(origin, direction);
-        if (depth > 4 || !intersection.isIntersecting) {
+        if (depth > 4) {
             return currentScene.envmap.get(direction);
         }
 
-        Vec3 reflectDir = reflect(direction.inverse(), intersection.normal).normalize();
-        Vec3 reflectOrgin = reflectDir.dotProduct(intersection.normal) < 0 ?
-                intersection.hit.subtract(intersection.normal.multiply(1e-3)) :
-                intersection.hit.add(intersection.normal.multiply(1e-3));
-        Vec3 reflectColor = castRay(reflectOrgin, reflectDir, depth + 1);
+        Intersection intersection = sceneIntersect(origin, direction);
+        if (intersection == null) {
+            return currentScene.envmap.get(direction);
+        }
 
-        Vec3 refractDir = refract(direction, intersection.normal, intersection.material.refractiveIndex).normalize();
-        Vec3 refractOrigin = refractDir.dotProduct(intersection.normal) < 0 ?
-                intersection.hit.subtract(intersection.normal.multiply(1e-3)) :
-                intersection.hit.add(intersection.normal.multiply(1e-3));
-        Vec3 refractColor = castRay(refractOrigin, refractDir, depth + 1);
+        Vec3 pointInside = intersection.hit.subtract(intersection.normal.multiply(1e-3));
+        Vec3 pointOutside = intersection.hit.add(intersection.normal.multiply(1e-3));
+
+        Vec3 reflectionComponent = new Vec3(0, 0, 0);
+        if (intersection.material.albedo[2] != 0) {
+            Vec3 reflectDir = reflect(direction.inverse(), intersection.normal).normalize();
+            Vec3 reflectOrgin = reflectDir.dotProduct(intersection.normal) < 0 ? pointInside : pointOutside;
+            reflectionComponent = castRay(reflectOrgin, reflectDir, depth + 1).multiply(intersection.material.albedo[2]);
+        }
+
+        Vec3 refractionComponent = new Vec3(0, 0, 0);
+        if (intersection.material.albedo[3] != 0) {
+            Vec3 refractDir = refract(direction, intersection.normal, intersection.material.refractiveIndex).normalize();
+            Vec3 refractOrigin = refractDir.dotProduct(intersection.normal) < 0 ? pointInside : pointOutside;
+            refractionComponent = castRay(refractOrigin, refractDir, depth + 1).multiply(intersection.material.albedo[3]);
+        }
 
         double diffuseLightIntensity = 0;
         double specularLightIntensity = 0;
@@ -91,13 +100,11 @@ public class Renderer {
             Vec3 lightDir = light.position.subtract(intersection.hit).normalize();
             double lightDistance = light.position.subtract(intersection.hit).length();
 
-            Vec3 shadowOrigin = lightDir.dotProduct(intersection.normal) < 0 ?
-                    intersection.hit.subtract(intersection.normal.multiply(1e-3)) :
-                    intersection.hit.add(intersection.normal.multiply(1e-3));
+            Vec3 shadowOrigin = lightDir.dotProduct(intersection.normal) < 0 ? pointInside : pointOutside;
 
             Intersection intersectionShadows = sceneIntersect(shadowOrigin, lightDir);
 
-            if (intersectionShadows.isIntersecting && intersection.hit.subtract(shadowOrigin).length() < lightDistance)
+            if (intersectionShadows != null && intersection.hit.subtract(shadowOrigin).length() < lightDistance)
                 continue;
 
             diffuseLightIntensity += light.intensity * Math.max(0, lightDir.dotProduct(intersection.normal));
@@ -114,21 +121,17 @@ public class Renderer {
                 .multiply(specularLightIntensity)
                 .multiply(intersection.material.albedo[1]);
 
-        Vec3 reflectionComponent = reflectColor.multiply(intersection.material.albedo[2]);
-
-        Vec3 refractionComponent = refractColor.multiply(intersection.material.albedo[3]);
-
         return diffuseComponent.add(specularComponent).add(reflectionComponent).add(refractionComponent);
     }
 
     private Intersection sceneIntersect(Vec3 origin, Vec3 direction) {
         double objectDistance = Double.MAX_VALUE;
 
-        Intersection result = new Intersection();
+        Intersection result = null;
 
         for (Sphere sphere : currentScene.spheres) {
             Intersection intersection = sphere.rayIntersect(origin, direction);
-            if (intersection.isIntersecting && intersection.distance < objectDistance) {
+            if (intersection != null && intersection.distance < objectDistance) {
                 objectDistance = intersection.distance;
                 Vec3 hit = origin.add(direction.multiply(intersection.distance));
                 result = new Intersection(
