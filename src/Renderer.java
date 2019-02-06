@@ -104,7 +104,7 @@ public class Renderer {
 
             Intersection intersectionShadows = sceneIntersect(shadowOrigin, lightDir);
 
-            if (intersectionShadows != null && intersection.hit.subtract(shadowOrigin).length() < lightDistance)
+            if (intersectionShadows != null && intersectionShadows.hit.subtract(shadowOrigin).length() < lightDistance)
                 continue;
 
             diffuseLightIntensity += light.intensity * Math.max(0, lightDir.dotProduct(intersection.normal));
