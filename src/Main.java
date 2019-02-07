@@ -4,12 +4,17 @@ import Renderer.Scene;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
-    private static final boolean withGui = true;
+    // Settings
+    private static final boolean withGui = false;
     private static final boolean withImage = true;
     private static final boolean withSphereWall = true;
+    private static final Map<String, List<Long>> times = new HashMap<>();
 
     public static void main(String[] args) {
         if (!withGui && !withImage) {
@@ -45,19 +50,34 @@ public class Main {
 
         scene.loadEnvmap("data/envmap.jpg");
 
-        renderWithResolution(1024, 768, scene);
-        renderWithResolution(1920, 1080, scene);
-        renderWithResolution(1920 * 2, 1080 * 2, scene);
+        int[] fovs = new int[]{60, 90, 30};
+//        int[] fovs = new int[]{60};
+        int runs = 10;
+//        int runs = 1;
+
+        for (int i = 0; i < runs; i++) {
+//            renderWithResolution(1024 / 4, 768 / 4, fovs, scene);
+            renderWithResolution(1024, 768, fovs, scene);
+            renderWithResolution(1920, 1080, fovs, scene);
+            renderWithResolution(1920 * 2, 1080 * 2, fovs, scene);
+        }
+
+        System.out.println("Average times:");
+        times.forEach((key, value) -> {
+            double avg = 0;
+            for (Long l : value) {
+                avg += l;
+            }
+            avg /= 1000 * value.size();
+            System.out.println("\t" + key + ":\t" + avg);
+        });
     }
 
-    private static void renderWithResolution(int width, int height, Scene scene) {
+    private static void renderWithResolution(int width, int height, int[] fovs, Scene scene) {
         Renderer renderer = new Renderer();
         renderer.setSize(width, height);
 
         renderer.setScene(scene);
-
-        int[] fovs = new int[]{60, 90, 30};
-//        int[] fovs = new int[]{60};
 
         for (int fov : fovs) {
             if (withGui) {
@@ -66,10 +86,20 @@ public class Main {
             }
 
             renderer.setFov(fov);
-            renderer.render();
+            long time = renderer.render();
+
+            String curRenderString = fov + "fov" + width + 'x' + height;
+            List<Long> curTimes = times.get(curRenderString);
+            if (curTimes == null) {
+                curTimes = new ArrayList<>();
+                curTimes.add(time);
+                times.put(curRenderString, curTimes);
+            } else {
+                curTimes.add(time);
+            }
 
             if (withImage) {
-                ImageWriter.saveImage(renderer.getImage(), "out" + fov + "fov" + width + 'x' + height);
+                ImageWriter.saveImage(renderer.getImage(), "out" + curRenderString);
             }
         }
     }

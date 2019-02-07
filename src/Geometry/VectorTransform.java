@@ -2,7 +2,6 @@ package Geometry;
 
 public class VectorTransform {
     public static Vec3 reflect(Vec3 I, Vec3 N) {
-        //TODO: optimize?
         return N.mul(2).mul(I.dot(N)).sub(I);
     }
 
@@ -12,12 +11,6 @@ public class VectorTransform {
 
     public static Vec3 refract(Vec3 I, Vec3 N, double eta_t, double eta_i) {
         double cosi = -I.dot(N);
-
-        if (cosi > 1 || cosi < -1) {
-            System.err.println("DEBUG: cosi = " + cosi);
-            System.err.println("DEBUG: I = " + I);
-            System.err.println("DEBUG: N = " + N);
-        }
 
         if (cosi < 0) {
             return refract(I, N.inverse(), eta_i, eta_t);
