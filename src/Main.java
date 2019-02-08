@@ -14,6 +14,7 @@ public class Main {
     private static final boolean withGui = false;
     private static final boolean withImage = true;
     private static final boolean withSphereWall = true;
+    private static final boolean timeTests = false;
     private static final Map<String, List<Long>> times = new HashMap<>();
 
     public static void main(String[] args) {
@@ -51,15 +52,21 @@ public class Main {
         scene.loadEnvmap("data/envmap.jpg");
 
         int[] fovs = new int[]{60, 90, 30};
-//        int[] fovs = new int[]{60};
-        int runs = 10;
-//        int runs = 1;
+        int runs;
+        if (timeTests) {
+            runs = 10;
+        } else {
+            runs = 1;
+        }
 
         for (int i = 0; i < runs; i++) {
-//            renderWithResolution(1024 / 4, 768 / 4, fovs, scene);
-            renderWithResolution(1024, 768, fovs, scene);
-            renderWithResolution(1920, 1080, fovs, scene);
-            renderWithResolution(1920 * 2, 1080 * 2, fovs, scene);
+            if (timeTests) {
+                renderWithResolution(1024 / 4, 768 / 4, fovs, scene);
+            } else {
+                renderWithResolution(1024, 768, fovs, scene);
+                renderWithResolution(1920, 1080, fovs, scene);
+                renderWithResolution(1920 * 2, 1080 * 2, fovs, scene);
+            }
         }
 
         System.out.println("Average times:");

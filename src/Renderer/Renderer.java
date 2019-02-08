@@ -128,13 +128,13 @@ public class Renderer {
 
             //TODO: optimize this+
             double lightDotN = lightDir.dot(isn.N);
-            if (lightDotN > 0) {
-                Intersection isnShadows = sceneIntersect(new Ray(pointOutside, lightDir));
+            Vec3 shadowOrigin = lightDotN < 0 ? pointInside : pointOutside;
 
-                //TODO: optimize this+
-                if (isnShadows != null && isnShadows.dist < lightDist)
-                    continue;
-            }
+            Intersection isnShadows = sceneIntersect(new Ray(shadowOrigin, lightDir));
+
+            //TODO: optimize this+
+            if (isnShadows != null && isnShadows.dist < lightDist)
+                continue;
 
             diffuseLightIntensity += light.intensity * Math.max(0, lightDotN);
             specularLightIntensity += Math.pow(
